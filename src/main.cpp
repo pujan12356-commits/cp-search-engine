@@ -1,12 +1,28 @@
-#include "Parser.h"
 #include <iostream>
+#include "Document.h"
+#include "Parser.h"
+#include "InvertedIndex.h"
+
+using namespace std;
 
 int main() {
-    Parser p;
+    Document d1(0, "graph",
+        "graph bfs dfs graph");
 
-    auto tokens =
-        p.parse("The graph is in the tree and the binary search");
+    Document d2(1, "tree",
+        "binary search tree graph");
 
-    for(auto &x : tokens)
-        cout << x << "\n";
+    InvertedIndex idx;
+
+    idx.addDocument(d1);
+    idx.addDocument(d2);
+
+    auto res = idx.lookup("graph");
+
+    cout << "graph:\n";
+
+    for (int x : res)
+        cout << x << " ";
+
+    cout << "\n";
 }
