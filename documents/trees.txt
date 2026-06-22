@@ -1,0 +1,1 @@
+Trees are hierarchical data structures. Binary search trees AVL trees and segment trees are common in competitive programming.

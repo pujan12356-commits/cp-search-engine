@@ -1,0 +1,1 @@
+Dynamic programming solves complex problems by breaking them into subproblems. DP is used in knapsack fibonacci and shortest path problems.

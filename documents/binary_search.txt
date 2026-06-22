@@ -1,0 +1,1 @@
+Binary search finds elements in sorted arrays in O log n time. It is used in search problems and optimization with monotonic functions.
