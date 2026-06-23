@@ -23,27 +23,30 @@ vector<Document> loadDocuments(const string &folder){
     return docs;
 }
 
-//double tfidf(){
-   
-//}
+double tfidf(const string &term,const Document &doc,int totalDocs,int docFreq,Parser &parser){
+    auto tokens = parser.parse(doc.content);
+    int count =0;
+    for(auto &token: tokens) if(token==term) count++;
+    double tf = (double)count/tokens.size();
+    double idf = log((double)totalDocs/(docFreq+1));
+    return tf*idf;
+}
 
 //void printResults(){
    
 //}
 
-int main(){
-   
-     auto docs = loadDocuments("../documents");
-
-    for(auto &doc : docs)
-        cout << doc.id << " "
-             << doc.title << " "
-             << doc.wordCount << endl;
-             
+int main() {
+    auto docs = loadDocuments("../documents");
     InvertedIndex idx;
-
     for(auto &doc : docs)
         idx.addDocument(doc);
-    cout << idx.getTotalDocs() << endl;         
-
+    Parser p;
+    cout << tfidf(
+        "graph",
+        docs[2],
+        idx.getTotalDocs(),
+        idx.getDocFreq("graph"),
+        p
+    ) << endl;
 }
