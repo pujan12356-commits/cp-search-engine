@@ -1,28 +1,49 @@
 #include <iostream>
+#include <fstream>
+#include <vector>
+#include <cmath>
+#include <algorithm>
 #include "Document.h"
 #include "Parser.h"
 #include "InvertedIndex.h"
 
 using namespace std;
 
-int main() {
-    Document d1(0, "graph",
-        "graph bfs dfs graph");
+vector<Document> loadDocuments(const string &folder){
+    vector<Document> docs;
+    int id=0;
+    vector<string> files = {"binary_search","dp","graph","sorting","trees"};
+    for(auto &name: files){
+        string path = folder + "/" + name + ".txt";
+        ifstream file(path);
+        if(!file.is_open()) continue;
+        string content((istreambuf_iterator<char>(file)),istreambuf_iterator<char>());
+        docs.push_back(Document(id++,name,content));
+    }
+    return docs;
+}
 
-    Document d2(1, "tree",
-        "binary search tree graph");
+//double tfidf(){
+   
+//}
 
+//void printResults(){
+   
+//}
+
+int main(){
+   
+     auto docs = loadDocuments("../documents");
+
+    for(auto &doc : docs)
+        cout << doc.id << " "
+             << doc.title << " "
+             << doc.wordCount << endl;
+             
     InvertedIndex idx;
 
-    idx.addDocument(d1);
-    idx.addDocument(d2);
+    for(auto &doc : docs)
+        idx.addDocument(doc);
+    cout << idx.getTotalDocs() << endl;         
 
-    auto res = idx.lookup("graph");
-
-    cout << "graph:\n";
-
-    for (int x : res)
-        cout << x << " ";
-
-    cout << "\n";
 }
