@@ -25,6 +25,7 @@ vector<Document> loadDocuments(const string &folder){
 
 double tfidf(const string &term,const Document &doc,int totalDocs,int docFreq,Parser &parser){
     auto tokens = parser.parse(doc.content);
+    if(tokens.empty()) return 0;
     int count =0;
     for(auto &token: tokens) if(token==term) count++;
     double tf = (double)count/tokens.size();
@@ -32,21 +33,66 @@ double tfidf(const string &term,const Document &doc,int totalDocs,int docFreq,Pa
     return tf*idf;
 }
 
-//void printResults(){
-   
-//}
+void printResults(const vector<int> &ids, const vector<Document> &docs){
+     if(ids.empty()){
+        cout<<"No results found."<<endl;
+        return;
+     }
+     for(int id: ids){
+        cout<<"->"<<docs[id].title<<".txt"<<endl;
+     }
+}
 
-int main() {
+int main(){
     auto docs = loadDocuments("../documents");
     InvertedIndex idx;
-    for(auto &doc : docs)
-        idx.addDocument(doc);
+    for(auto &doc: docs) idx.addDocument(doc);
+    cout<<"CP Search Engine-"<<docs.size()<<" documents indexed."<<endl;
+    cout<<"Ready for queries"<<endl;
+    cout << "Commands: <term>  |  "
+         << "<term> AND <term>  |  "
+         << "<term> OR <term>  |  quit" << endl;
+    cout << string(50, '-') << endl;
+    string query;
     Parser p;
-    cout << tfidf(
-        "graph",
-        docs[2],
-        idx.getTotalDocs(),
-        idx.getDocFreq("graph"),
-        p
-    ) << endl;
+
+    while(true){
+        cout<<"\nSearch: ";
+        getline(cin,query);
+        if(query=="quit") break;
+        auto andPos = query.find(" AND ");
+        auto orPos = query.find(" OR ");
+        
+        if(andPos!=string::npos){
+            string a = query.substr(0,andPos);
+            string b = query.substr(andPos+5);
+            auto results = idx.andSearch(a,b);
+            printResults(results,docs);
+        }
+        else if(orPos!=string::npos){
+            string a = query.substr(0,orPos);
+            string b = query.substr(orPos+4);
+            auto results = idx.orSearch(a,b);
+            printResults(results,docs);
+        }
+        else{
+            auto results = idx.lookup(query);
+            if(results.empty()){
+                cout<<"No results found."<<endl;
+                continue;
+            }
+            vector<pair<double,int>> scored;
+            int docFreq = idx.getDocFreq(query);
+            for(int id: results){
+                double score = tfidf(query,docs[id],docs.size(),docFreq,p);
+                scored.push_back({score,id});
+            }
+            sort(scored.rbegin(), scored.rend());
+            for (auto& [score, id] : scored)
+                cout << "  → " << docs[id].title
+                     << ".txt (score: "
+                     << score << ")" << endl;
+        }
+    }
+    return 0;
 }
