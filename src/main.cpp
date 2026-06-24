@@ -6,6 +6,7 @@
 #include "Document.h"
 #include "Parser.h"
 #include "InvertedIndex.h"
+#include "LRUCache.h"
 
 using namespace std;
 
@@ -55,6 +56,7 @@ int main(){
     cout << string(50, '-') << endl;
     string query;
     Parser p;
+    LRUCache cache(5);
 
     while(true){
         cout<<"\nSearch: ";
@@ -76,10 +78,16 @@ int main(){
             printResults(results,docs);
         }
         else{
-            auto results = idx.lookup(query);
-            if(results.empty()){
-                cout<<"No results found."<<endl;
-                continue;
+            auto results = cache.get(query);
+            if(!results.empty()) cout<<"CACHE HIT"<<endl;
+            else{
+                cout<<"CACHE MISS"<<endl;
+                results = idx.lookup(query);
+                if(results.empty()){
+                    cout<<"No results found."<<endl;
+                    continue;
+                }
+                cache.put(query,results);
             }
             vector<pair<double,int>> scored;
             int docFreq = idx.getDocFreq(query);
