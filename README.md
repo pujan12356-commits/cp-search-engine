@@ -1,54 +1,106 @@
 # CP Search Engine
 
-A search engine built from scratch in C++ to explore how modern search systems work internally.
+This is a simple search engine built in C++ to understand how search engines work internally. Instead of using existing search libraries, I implemented the main components myself, including indexing, ranking, caching, and typo correction.
 
-The project processes text documents, extracts useful keywords, and builds data structures that allow efficient searching. The goal is to implement the core components of a search engine rather than rely on existing libraries.
+The project indexes a collection of text documents and allows users to search them through a command-line interface.
 
-## Current Progress
+## Features
 
-* Document representation
-* Text parser
-* Tokenization
-* Stop-word removal
-* Case-insensitive text processing
+* Document loading from text files
+* Tokenization and stop-word removal
+* Inverted index for fast searching
+* TF-IDF based ranking
+* Boolean queries (AND / OR)
+* LRU cache for repeated searches
+* Spell correction using Edit Distance
+* Interactive command-line search interface
 
-## Planned Features
+## How it Works
 
-* Inverted index
-* Keyword search
-* TF-IDF ranking
-* Query caching
-* Spell correction
+### Document Loading
 
-## Project Structure
+The engine reads text files from the documents folder and stores them as Document objects.
 
-```text
-documents/
-src/
-├── Document.h
-├── Parser.h
-├── InvertedIndex.h
-└── main.cpp
-```
+### Parsing
 
-## Example
+Documents are converted into tokens by:
 
-Input:
+* Converting text to lowercase
+* Removing punctuation
+* Removing common stop words
 
-```text
-The graph is in the tree and the binary search
-```
+### Inverted Index
 
-Output:
+An inverted index maps each word to the documents containing that word.
 
-```text
+Example:
+
+graph -> [2]
+
+dfs -> [2]
+
+dp -> [1]
+
+This allows queries to be answered without scanning every document.
+
+### Boolean Search
+
+The search engine supports:
+
+graph AND dfs
+
+graph OR dp
+
+AND queries are handled using set intersection, while OR queries use set union.
+
+### TF-IDF Ranking
+
+For single-word searches, matching documents are ranked using TF-IDF scores so that more relevant documents appear first.
+
+### LRU Cache
+
+Recently searched queries are stored in an LRU cache. If the same query is searched again, the result can be returned directly from cache.
+
+### Spell Correction
+
+If a query does not match any indexed term, the engine suggests the closest word using Levenshtein Edit Distance.
+
+Example:
+
+grahp → graph
+
+## Technologies Used
+
+* C++
+* STL
+
+  * vector
+  * list
+  * unordered_map
+  * set
+* File I/O
+* Dynamic Programming
+* Hashing
+* Information Retrieval concepts
+
+## Example Queries
+
 graph
-tree
-binary
-search
-```
 
-## Motivation
+graph AND dfs
 
-Search engines are a good way to learn about data structures, text processing, indexing, ranking algorithms, and systems design. This project is being built incrementally, with each component implemented from scratch in C++.
+graph OR dp
 
+grahp
+
+## What I Learned
+
+While building this project, I learned how search engines organize and retrieve information efficiently. I also got hands-on experience with hash maps, caching, dynamic programming, file handling, and designing a multi-component C++ project from scratch.
+
+## Future Improvements
+
+- Generate the vocabulary automatically from the inverted index instead of maintaining a manual vocabulary list for spell correction.
+- Support case-insensitive queries by applying the same normalization pipeline to both documents and user queries.
+- Add phrase search support to allow queries such as "dynamic programming" or "binary search".
+- Experiment with more advanced ranking algorithms such as BM25 and compare them with TF-IDF.
+- Build a simple web interface on top of the search engine to make document searching more user-friendly.
