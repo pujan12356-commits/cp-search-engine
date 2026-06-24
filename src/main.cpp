@@ -7,6 +7,7 @@
 #include "Parser.h"
 #include "InvertedIndex.h"
 #include "LRUCache.h"
+#include "SpellCorrector.h"
 
 using namespace std;
 
@@ -48,6 +49,8 @@ int main(){
     auto docs = loadDocuments("../documents");
     InvertedIndex idx;
     for(auto &doc: docs) idx.addDocument(doc);
+    vector<string> vocabulary = {"graph","dfs","bfs","tree",
+                            "sorting","binary","search","dp"};
     cout<<"CP Search Engine-"<<docs.size()<<" documents indexed."<<endl;
     cout<<"Ready for queries"<<endl;
     cout << "Commands: <term>  |  "
@@ -57,6 +60,7 @@ int main(){
     string query;
     Parser p;
     LRUCache cache(5);
+    SpellCorrector sc;
 
     while(true){
         cout<<"\nSearch: ";
@@ -84,8 +88,12 @@ int main(){
                 cout<<"CACHE MISS"<<endl;
                 results = idx.lookup(query);
                 if(results.empty()){
+                   string suggestion = sc.suggest(query,vocabulary);
+                   if(!suggestion.empty()) cout<<"Did you mean: "<<suggestion<<" ?"<<endl;
+                   else{
                     cout<<"No results found."<<endl;
-                    continue;
+                   }
+                   continue;
                 }
                 cache.put(query,results);
             }
