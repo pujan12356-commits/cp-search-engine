@@ -1,4 +1,4 @@
-# CP Search Engine
+# C++ Search Engine
 
 This is a simple search engine built in C++ to understand how search engines work internally. Instead of using existing search libraries, I implemented the main components myself, including indexing, ranking, caching, and typo correction.
 
